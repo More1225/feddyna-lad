@@ -1,0 +1,13 @@
+# Runtime, metrics and result serialization. Versions are intentionally unpinned.
+# See docs/dependency_audit.md; this is not a historical environment lockfile.
+torch
+numpy
+pandas
+scikit-learn
+matplotlib
+openpyxl
+tqdm
+
+# Selected dataset-preparation scripts and bundled Drain parsers.
+gensim
+regex
