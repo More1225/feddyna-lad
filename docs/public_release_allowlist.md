@@ -1,8 +1,8 @@
-# Public release allowlist
+# Public Release Boundary / Manifest
 
 The public repository centers on the FedDyna implementation, its training/evaluation pipeline, model, supported baseline adapters and current execution utilities. Preprocessing is secondary: one reference workflow per dataset plus mixed-client assembly documents how to prepare compatible inputs.
 
-Only the **71 files** individually marked YES are intended for publication. Directory names do not include unlisted descendants. Historical preprocessing provenance is a `DOCUMENTED_LIMITATION`; it is not a release blocker unless the current documented workflow is broken, indeterminate or misleading. Detailed audit evidence remains local.
+This maintenance manifest records the intended public repository boundary and helps prevent accidental inclusion of raw datasets, generated NPZ data, checkpoints, experiment results, manuscript artifacts, temporary files and internal research artifacts. The **70 files** individually marked YES form the current source snapshot, including **58 Python files**. Directory names do not include unlisted descendants. See [reproducibility notes](reproducibility_notes.md) for the limitations of the supplied workflows.
 
 | Path | Include | Reason |
 | --- | --- | --- |
@@ -29,7 +29,6 @@ Only the **71 files** individually marked YES are intended for publication. Dire
 | `docs/canonical_reproduction_path.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
 | `docs/dependency_audit.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
 | `docs/execution_flow.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
-| `docs/final_release_tree.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
 | `docs/public_release_allowlist.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
 | `docs/reproducibility_notes.md` | YES | Essential execution, baseline, reproducibility or release-scope documentation. |
 | `federated/__init__.py` | YES | FedDyna core, model, training/evaluation infrastructure or supported baseline adapter dependency. |
@@ -83,22 +82,13 @@ Only the **71 files** individually marked YES are intended for publication. Dire
 | Path/category | Include | Reason |
 | --- | --- | --- |
 | `paper/` | NO | Manuscript artifacts are intentionally excluded from the public code release. |
-| `data/HDFS/Drain.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/HDFS/prepare_fed_hdfs_v6.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/MIX/client_selector.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/TB/prepare_fed_thunderbird_10m_logs_sequential.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/config_merge.yaml` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/merge_hdfs_bgl_dynamic.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `data/merge_hdfs_bgl_federated.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `docs/experiment_commands_kdars.md` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `docs/feddyna_code_logic.md` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `scripts/summarize_communication_cost.py` | NO | Historical, alternate or redundant workflow/documentation outside the current minimal release; preserved locally. |
-| `Controlled Experiment/`, backups and historical preprocessing variants | NO | Independent archives and superseded variants are not required by the current public pipeline. |
-| Internal provenance, terminology, paper-code and release-preparation audit documents | NO | Detailed historical evidence remains local; user-relevant limitations are summarized in reproducibility_notes.md. |
-| Raw/prepared datasets, experiment archives, checkpoints, temporary results and caches | NO | Local inputs and generated artifacts are not source-release files. |
-| `analysis/`, `figures/`, submission materials and temporary plotting scripts | NO | Local-only or manuscript-oriented artifacts. |
+| Raw datasets and generated NPZ/client CSV data | NO | Inputs and prepared data must be obtained or generated separately. |
+| Checkpoints and experiment results | NO | Generated outputs are outside the source repository. |
+| Manuscripts, bibliography, submission materials and paper figures | NO | Paper artifacts are maintained separately from the implementation. |
+| Backups, temporary files and caches | NO | Local working artifacts are outside the maintained source boundary. |
+| Internal research artifacts and superseded workflow variants | NO | These are not dependencies of the documented reference implementation. |
 | Any file not individually listed YES | NO | Explicit allowlist; no blanket directory inclusion. |
 
-## Git publication boundary
+## Maintaining the boundary
 
-This list defines the intended source snapshot, not the current Git index or history. Existing tracked files and historical commits may still contain excluded material; `.gitignore` does not remove them. A separate final Git-boundary check is required before publishing. Excluded files must remain on disk. No remote configuration or push is part of this scope adjustment.
+Keep this manifest synchronized with intentional source additions and removals. Before sharing a new snapshot, compare its Git tree with the individually included paths and inspect staged changes for excluded artifacts. `.gitignore` does not remove already tracked files. This manifest governs repository inclusion; it does not require deleting local datasets or generated results.

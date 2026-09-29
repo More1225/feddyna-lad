@@ -25,7 +25,6 @@
 !/docs/canonical_reproduction_path.md
 !/docs/dependency_audit.md
 !/docs/execution_flow.md
-!/docs/final_release_tree.md
 !/docs/public_release_allowlist.md
 !/docs/reproducibility_notes.md
 !/federated/__init__.py

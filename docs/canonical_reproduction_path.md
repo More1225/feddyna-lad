@@ -1,6 +1,6 @@
 # Current preparation and execution workflow
 
-Start with a compatible dense NPZ file to run **the current public reference implementation**. The optional preparation recipes below support that interface. See [provenance limitations](reproducibility_notes.md). Run training commands from the repository root and supply the input path explicitly.
+Start with a compatible dense NPZ file to run **the current public reference implementation**. The optional preparation recipes below support that interface. Start with the [README installation and run instructions](../README.md#installation); use this guide for data preparation and experiment utilities. See [provenance limitations](reproducibility_notes.md). Run training commands from the repository root and supply the input path explicitly.
 
 ## Dataset producers and consumers
 
@@ -11,7 +11,7 @@ Start with a compatible dense NPZ file to run **the current public reference imp
 | Thunderbird | data/TB/prepare_fed_thunderbird_10m_logs_shuffle.py | Thunderbird.log | fed_data/thunderbird_fed_unified_10client_5-2-3_shuffle.npz, client*_shuffle.csv and embeddings | Dense NPZ loader or MIX generator |
 | Mixed systems | data/MIX/mix_federated_generator.py | Selected client train/val/test CSV triplets in one directory | mixed_fed_unified.npz, vocabulary, embeddings, client statistics and usage text | FedDyna.py via data/train_utils.py |
 
-These are current reference producers for the [documented dense NPZ interface](../README.md#expected-data-interface). Historical HDFS producer identity and Thunderbird raw-to-final lineage are `DOCUMENTED_LIMITATION`, not release blockers by themselves. Current reference scripts retain their existing behavior, including Thunderbird's first-10-million-entry limit. No byte-identical historical regeneration is claimed.
+These are current reference producers for the [documented dense NPZ interface](../README.md#expected-data-interface). Known provenance limitations include historical HDFS producer identity and Thunderbird raw-to-final lineage. Current reference scripts retain their existing behavior, including Thunderbird's first-10-million-entry limit. No byte-identical historical regeneration is claimed.
 
 ### HDFS
 
@@ -37,11 +37,11 @@ python prepare_fed_thunderbird_10m_logs_shuffle.py
 cd ../..
 ```
 
-The local Drain.py beside each script is required. Both write into a relative fed_data directory. Run in a fresh workspace/output context when preserving prior experiment artifacts. Dataset preparation can be memory-intensive and was not executed during release preparation.
+The local Drain.py beside each script is required. Both write into a relative fed_data directory. Run in a fresh workspace/output context when preserving prior experiment artifacts. Dataset preparation can be memory-intensive; an end-to-end preprocessing run has not been validated for the reference workflow described here.
 
 ### Assemble a mixed dataset
 
-Create `data/MIX/current` and copy your chosen clients' complete train/val/test CSV triplets into it. Choose and record client identities explicitly; this release does not silently select historical clients. HDFS filenames are `client_<id>_<split>.csv`; BGL uses `client<id>_<split>.csv`; Thunderbird shuffle uses `client<id>_<split>_shuffle.csv`. HDFS event_ids/label and BGL/TB sequence/label columns are accepted by the loader in the generator.
+Create `data/MIX/current` and copy your chosen clients' complete train/val/test CSV triplets into it. Choose and record client identities explicitly; the generator uses the clients supplied in that directory. HDFS filenames are `client_<id>_<split>.csv`; BGL uses `client<id>_<split>.csv`; Thunderbird shuffle uses `client<id>_<split>_shuffle.csv`. HDFS event_ids/label and BGL/TB sequence/label columns are accepted by the loader in the generator.
 
 ```console
 python data/MIX/mix_federated_generator.py --input_dir data/MIX/current --output_dir data/MIX/current --output_name mixed_fed_unified
@@ -72,7 +72,7 @@ Create a local `current_run.json` with this structure, changing only the input p
 }
 ```
 
-Omitting methods uses the launcher's built-in method definitions. Select one explicitly:
+The [multi-seed launcher](../scripts/run_5seed_experiments.py) uses its built-in method definitions when methods are omitted. Select FedDyna explicitly, preview the commands, then launch:
 
 ```console
 python scripts/run_5seed_experiments.py --config current_run.json --methods FedDyna --dry-run
@@ -81,13 +81,15 @@ python scripts/run_5seed_experiments.py --config current_run.json --methods FedD
 
 Outputs are organized as results-root/dataset-id/scenario/method/seed_N. The derived dataset-id is computed from the input path. Use the same JSON with --methods FedAvg,FedProx to run those adapters. The default seeds are 2024–2028; defaults are current settings, not recovered historical source/environment evidence.
 
+The multi-seed `--dry-run` skips training. Auxiliary launchers have additional preview behavior described below; do not assume all previews avoid data access or file creation.
+
 For ablations, copy scripts/ablation_5seed_config.json to a local configuration and add an explicit scenarios object as above. Run with --config pointing to that local file. Compatibility variant A2_w_o_HA means without the aggregation-scope selector; A1_w_o_EW uses sample-count weights. Do not relabel it uniform weighting.
 
 ## Auxiliary tools
 
-- scripts/run_rounds.py previews commands unless --execute is supplied. It expects its named prepared mixed inputs for S1/S2/S3 and runs 6/10/20/30-round budgets. Its FedDyna entropy view is explicitly shared_mask0.
-- scripts/run_sensitivity.py requires --scenario, --dataset, --data-path and --experiment. It retains its configured grids; inspect help before selecting a current experiment.
-- scripts/summarize_5seed_results.py reads completed run outputs and produces seed-level and mean/std summaries; use --results-root and --output-dir for your new cohort.
-- tools/plot_ha_analysis.py plots generated selector diagnostics; it does not supply or recreate historical paper figures.
+- **Round budgets:** [scripts/run_rounds.py](../scripts/run_rounds.py) previews commands unless `--execute` is supplied. It expects named prepared mixed inputs for S1 (5 HDFS + 5 Thunderbird), S2 (5 HDFS + 5 BGL) and S3 (5 HDFS + 2 BGL + 3 Thunderbird), and runs 6/10/20/30-round budgets. Check the script's scenario paths before use. Preview inspects input files and writes configuration artifacts. Its FedDyna entropy view is explicitly `shared_mask0`, which differs from the main configuration's `scope_aware`; matching round counts do not make the configurations equivalent.
+- **Sensitivity:** [scripts/run_sensitivity.py](../scripts/run_sensitivity.py) requires `--scenario`, `--dataset`, `--data-path` and `--experiment`. It retains its configured grids; inspect help before selecting a current experiment. It writes configuration artifacts and invokes the multi-seed launcher in dry-run mode unless `--execute` is supplied.
+- **Summaries:** [scripts/summarize_5seed_results.py](../scripts/summarize_5seed_results.py) reads completed run outputs and produces seed-level and mean/std summaries; use `--results-root` and `--output-dir` for your new cohort.
+- **Diagnostics:** [tools/plot_ha_analysis.py](../tools/plot_ha_analysis.py) plots generated selector diagnostics; it does not supply or recreate historical paper figures.
 
 See [baseline behavior](baseline_reproduction_status.md) for method-specific optimization/stopping and [dependency notes](dependency_audit.md) for environment limitations.

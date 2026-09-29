@@ -11,21 +11,21 @@ This is the current official public reference implementation of FedDyna. It supp
 - The `w/o EW` variant uses sample-count weighting, not uniform weighting.
 - The general five-seed launcher's default mixed-data path names a 4/3/3 cohort. The identified final Scenario 3 cohort and the MIX/round-budget paths use five HDFS, two BGL and three Thunderbird clients. Supply an explicit input path/scenario configuration for current experiments.
 
-Runtime names, defaults, algorithms and stored results are preserved. No settings were changed to force manuscript agreement.
+These implementation and historical configuration differences should be considered when comparing new runs with manuscript results.
 
 ## Documented historical limitations
 
 | Item | Classification | Consequence |
 | --- | --- | --- |
-| HDFS historical producer identity and client-file lineage | DOCUMENTED_LIMITATION | The retained v7 script is a current reference workflow, not a certified historical producer. |
-| Thunderbird historical raw-to-final lineage | DOCUMENTED_LIMITATION | The retained shuffle script defines its own current input processing; it does not recover every original raw-log limit or historical cohort. |
-| Complete preprocessing provenance for every paper input | DOCUMENTED_LIMITATION | Historical paper inputs were produced during the original experiment workflow. Exact regeneration of those artifacts is not claimed. |
-| Incomplete historical environment/source records and some baseline execution records | DOCUMENTED_LIMITATION | Package versions are unpinned and exact historical execution equivalence cannot be certified. |
-| Historical numerical exceptions | DOCUMENTED_LIMITATION | Reported AUPRC values for Scenario 3 FedALA, Scenario 3 FedSelect, Scenario 1 w/o EW and Scenario 3 w/o EW do not all match the identified raw cohorts. Do not claim those reported values were reproduced. |
+| HDFS historical producer identity and client-file lineage | Known limitation | The retained v7 script is a current reference workflow, not a certified historical producer. |
+| Thunderbird historical raw-to-final lineage | Known limitation | The retained shuffle script defines its own current input processing; it does not recover every original raw-log limit or historical cohort. |
+| Complete preprocessing provenance for every paper input | Known limitation | Historical paper inputs were produced during the original experiment workflow. Exact regeneration of those artifacts is not claimed. |
+| Incomplete historical environment/source records and some baseline execution records | Known limitation | Package versions are unpinned and exact historical execution equivalence cannot be certified. |
+| Historical numerical exceptions | Known limitation | Reported AUPRC values for Scenario 3 FedALA, Scenario 3 FedSelect, Scenario 1 w/o EW and Scenario 3 w/o EW do not all match the identified raw cohorts. Do not claim those reported values were reproduced. |
 
-Detailed evidence and numerical provenance tables remain in internal/local audit documents outside the public release. Historical datasets, outputs and manuscripts are not distributed here.
+Historical datasets, outputs, manuscripts and detailed numerical provenance tables are not distributed here. The limitations above describe the resulting boundaries on comparisons with historical results.
 
-Missing historical preprocessing lineage alone is not a release blocker. A current-input issue is blocking if the loader cannot consume the documented format, the required format cannot be determined, or a provided preparation script is nonfunctional or misleading. Static review has established the documented interface; preprocessing, training and evaluation were not executed during this scope adjustment.
+The documented input interface has been checked against the source. This static check does not establish end-to-end preprocessing, training or evaluation success. For current experiments, verify that prepared inputs meet the documented format and that preparation scripts work with your raw data; historical provenance limitations do not replace those checks.
 
 ## Record current experiments
 

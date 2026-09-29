@@ -1,6 +1,6 @@
 # Execution Flow
 
-This map follows the current main project source. Independent implementations under Controlled Experiment have separate entry points and are not the canonical main FedDyna execution path.
+This map follows the current reference implementation: the root entry point, common federated orchestration, configured FedDyna mechanisms, server aggregation and baseline adapters. See the [README](../README.md#running-feddyna) for the main run command.
 
 ## Main experiment flow
 
@@ -28,7 +28,7 @@ For exact ordering of state updates and calls, consult federated/round_runner.py
 | federated/aggregation_ops.py | Aggregation operations | Federated round path | Aggregate client states under selected scope and masks |
 | federated/broadcast.py | Broadcast helpers | Federated round path | Initialize client models from server state subject to mask semantics |
 
-The principal orchestrator is federated/round_runner.py. Confirm exact function names and invocation order against active source before implementation changes.
+The principal orchestrator is [federated/round_runner.py](../federated/round_runner.py), which defines the invocation order and selector activation/locking behavior.
 
 ## Baselines
 
