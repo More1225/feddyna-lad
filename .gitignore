@@ -1,4 +1,4 @@
-# Exact public release boundary; update docs/public_release_allowlist.md when adding files.
+# Exact source boundary; review explicit exceptions when adding files.
 # Existing tracked files and historical commits require a separate publication check.
 *
 !*/
@@ -21,12 +21,6 @@
 !/data/TB/prepare_fed_thunderbird_10m_logs_shuffle.py
 !/data/__init__.py
 !/data/train_utils.py
-!/docs/baseline_reproduction_status.md
-!/docs/canonical_reproduction_path.md
-!/docs/dependency_audit.md
-!/docs/execution_flow.md
-!/docs/public_release_allowlist.md
-!/docs/reproducibility_notes.md
 !/federated/__init__.py
 !/federated/aggregation_ops.py
 !/federated/broadcast.py
@@ -60,12 +54,6 @@
 !/personalization/metrics_tracker.py
 !/personalization/update_metrics.py
 !/requirements.txt
-!/scripts/ablation_5seed_config.json
-!/scripts/run_5seed_experiments.py
-!/scripts/run_rounds.py
-!/scripts/run_sensitivity.py
-!/scripts/summarize_5seed_results.py
-!/tools/plot_ha_analysis.py
 !/trainers/__init__.py
 !/trainers/standard_trainer.py
 !/utils/__init__.py

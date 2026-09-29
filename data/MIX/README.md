@@ -1,6 +1,6 @@
 # Mixed-system federated inputs
 
-Use mix_federated_generator.py to combine selected client CSV triplets into a dense unified NPZ. Follow the [current dataset workflow](../../docs/canonical_reproduction_path.md#assemble-a-mixed-dataset).
+Use mix_federated_generator.py to combine selected client CSV triplets into a dense unified NPZ. Follow the [current dataset workflow](../../README.md#data-preparation--input-format).
 
 | Source | Filename pattern | Sequence column |
 | --- | --- | --- |

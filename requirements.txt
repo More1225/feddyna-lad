@@ -1,5 +1,5 @@
 # Runtime, metrics and result serialization. Versions are intentionally unpinned.
-# See docs/dependency_audit.md; this is not a historical environment lockfile.
+# See README.md (Installation); this is not a historical environment lockfile.
 torch
 numpy
 pandas

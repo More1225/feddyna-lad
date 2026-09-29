@@ -4,7 +4,7 @@
 The current v7 workflow constructs balanced candidate clients, selects valid
 clients by anomaly-ratio quantiles, and writes preparation metadata.
 Inputs are Event_traces.csv and anomaly_label.csv. Historical producer identity
-is not certified; see docs/reproducibility_notes.md.
+is not certified; see README.md (Reproducibility note).
 """
 
 import argparse
