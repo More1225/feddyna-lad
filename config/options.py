@@ -41,8 +41,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--data_path",
         type=str,
-        default="./data/HDFS/fed_data/hdfs_fed_unified_v6.npz",
-        help="Path to the prepared federated dataset. The current default is an HDFS example and typically needs to be changed when switching datasets.",
+        required=True,
+        help="Required path to a user-supplied unified federated NPZ file.",
     )
     parser.add_argument("--num_classes", type=int, default=2)
     parser.add_argument("--input_dim", type=int, default=300)

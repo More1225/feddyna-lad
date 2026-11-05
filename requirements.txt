@@ -7,7 +7,3 @@ scikit-learn
 matplotlib
 openpyxl
 tqdm
-
-# Selected dataset-preparation scripts and bundled Drain parsers.
-gensim
-regex

@@ -1,6 +1,4 @@
 import copy
-import glob
-import json
 import os
 import random
 
@@ -10,7 +8,7 @@ os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 
 from config.options import parse_args
 from data.train_utils import DatasetSplit, get_data, collate_fn_with_lengths
@@ -41,105 +39,6 @@ def setup_seed(seed: int):
         pass
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
-
-def _pick_existing_path(explicit_path, candidates):
-    if explicit_path and os.path.exists(explicit_path):
-        return explicit_path
-    for path in candidates:
-        if path and os.path.exists(path):
-            return path
-    return None
-
-
-def load_global_testset(args):
-    data_dir = os.path.dirname(args.data_path) if getattr(args, "data_path", "") else os.path.join("data", args.dataset.upper(), "fed_data")
-
-    vocab_path = _pick_existing_path(
-        getattr(args, "vocab_path", None),
-        sorted(glob.glob(os.path.join(data_dir, "vocab*.json"))),
-    )
-    embed_path = _pick_existing_path(
-        getattr(args, "embed_path", None),
-        sorted(glob.glob(os.path.join(data_dir, "event_vectors*.npy"))),
-    )
-    npz_path = _pick_existing_path(
-        getattr(args, "global_test_npz_path", None),
-        [getattr(args, "data_path", None)] + sorted(glob.glob(os.path.join(data_dir, "*_fed_unified*.npz"))),
-    )
-    test_csv_path = _pick_existing_path(
-        getattr(args, "global_test_csv_path", None),
-        [os.path.join(data_dir, "log_test.csv")],
-    )
-
-    required_paths = {
-        "vocab": vocab_path,
-        "embedding": embed_path,
-        "npz": npz_path,
-        "global_test_csv": test_csv_path,
-    }
-    missing = [name for name, path in required_paths.items() if path is None]
-    if missing:
-        print(f"Warning: Missing files required for global test evaluation: {missing}. Skipping evaluation.")
-        return None, 0
-
-    with open(vocab_path, "r", encoding="utf-8") as f:
-        vocab = json.load(f)
-
-    event_embeddings = np.load(embed_path)
-    pad_vector = np.zeros((1, event_embeddings.shape[1]), dtype=np.float32)
-    event_embeddings_with_pad = np.vstack([pad_vector, event_embeddings])
-
-    npz_data = np.load(npz_path, allow_pickle=True)
-    max_seq_len = int(npz_data.get("max_seq_len", 50))
-
-    import pandas as pd
-
-    test_df = pd.read_csv(test_csv_path)
-    required_columns = {"sequence", "label"}
-    if not required_columns.issubset(set(test_df.columns)):
-        print(f"Warning: {test_csv_path} is missing columns {required_columns}. Skipping global test evaluation.")
-        return None, 0
-
-    def seq_to_tensor(seq_str):
-        if pd.isna(seq_str) or seq_str == "":
-            events = []
-        else:
-            events = list(map(int, str(seq_str).split()))
-
-        if len(events) > max_seq_len:
-            events = events[:max_seq_len]
-        else:
-            events = events + [0] * (max_seq_len - len(events))
-
-        indices = [vocab.get(str(e), 0) for e in events]
-        tensor = event_embeddings_with_pad[indices]
-        return torch.from_numpy(tensor).float()
-
-    class GlobalTestDataset(Dataset):
-        def __init__(self, dataframe):
-            self.sequences = dataframe["sequence"].tolist()
-            self.labels = dataframe["label"].values.astype(np.int64)
-
-        def __len__(self):
-            return len(self.sequences)
-
-        def __getitem__(self, idx):
-            return seq_to_tensor(self.sequences[idx]), self.labels[idx]
-
-    dataset = GlobalTestDataset(test_df)
-    batch_size = getattr(args, "local_bs", getattr(args, "batch_size", 64))
-    test_loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=getattr(args, "num_workers", 0),
-        pin_memory=torch.cuda.is_available(),
-        drop_last=False,
-    )
-
-    print(f"Loaded global test set with {len(dataset)} samples.")
-    return test_loader, len(dataset)
 
 
 def load_model(args):
@@ -357,31 +256,6 @@ def main():
             "test_metrics_local": test_metrics_local,
             "avg_test_local": avg_local,
         })
-
-    print("\n" + "=" * 80)
-    print("Global test evaluation (log_test.csv)")
-    print("=" * 80)
-    global_test_loader, global_test_size = load_global_testset(args)
-    if global_test_loader is not None and global_test_size > 0:
-        device = torch.device("cuda" if torch.cuda.is_available() and str(args.device).startswith("cuda") else "cpu")
-        final_global_model.eval()
-        final_global_model.to(device)
-        global_test_metrics = evaluate_model(final_global_model, global_test_loader, device)
-
-        print("Global model metrics on the global test set:")
-        print(f"  Samples: {global_test_size}")
-        print(f"  Accuracy:  {global_test_metrics.get('accuracy', 0.0):.4f}")
-        print(f"  Precision: {global_test_metrics.get('precision', 0.0):.4f}")
-        print(f"  Recall:    {global_test_metrics.get('recall', 0.0):.4f}")
-        print(f"  F1:        {global_test_metrics.get('f1', 0.0):.4f}")
-        print(f"  PRAUC:              {global_test_metrics.get('prauc', 0.0):.4f}")
-        print(f"  AUROC:              {global_test_metrics.get('auroc', 0.0):.4f}")
-
-        if isinstance(history, list):
-            history[-1]["global_test_metrics"] = global_test_metrics
-            history[-1]["global_test_size"] = global_test_size
-    else:
-        print("Warning: Failed to load the global test set. Skipping evaluation.")
 
     # Print the communication summary.
     if comm_tracker is not None:

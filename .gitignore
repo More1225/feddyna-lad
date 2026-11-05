@@ -12,13 +12,6 @@
 !/core/exceptions.py
 !/core/mask_semantics.py
 !/core/math_utils.py
-!/data/BGL/Drain.py
-!/data/BGL/prepare_fed_bgl-10client-5-2-3.py
-!/data/HDFS/prepare_fed_hdfs_v7.py
-!/data/MIX/README.md
-!/data/MIX/mix_federated_generator.py
-!/data/TB/Drain.py
-!/data/TB/prepare_fed_thunderbird_10m_logs_shuffle.py
 !/data/__init__.py
 !/data/train_utils.py
 !/federated/__init__.py
